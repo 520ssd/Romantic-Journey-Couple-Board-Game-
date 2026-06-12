@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="herBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9a8d4"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="100" fill="url(#herBg)"/>
+  <!-- ears -->
+  <path d="M55 70 L40 30 L85 55 Z" fill="#ec4899"/>
+  <path d="M145 70 L160 30 L115 55 Z" fill="#ec4899"/>
+  <!-- face -->
+  <circle cx="100" cy="115" r="55" fill="#ffe4ec"/>
+  <!-- eyes -->
+  <circle cx="80" cy="105" r="6" fill="#9d174d"/>
+  <circle cx="120" cy="105" r="6" fill="#9d174d"/>
+  <!-- nose / mouth -->
+  <path d="M92 122 Q100 130 108 122" stroke="#9d174d" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- blush -->
+  <circle cx="68" cy="120" r="6" fill="#fbcfe8" opacity="0.8"/>
+  <circle cx="132" cy="120" r="6" fill="#fbcfe8" opacity="0.8"/>
+  <!-- bow -->
+  <path d="M100 50 L85 35 L100 42 L115 35 Z" fill="#be123c"/>
+  <circle cx="100" cy="42" r="4" fill="#be123c"/>
+</svg>

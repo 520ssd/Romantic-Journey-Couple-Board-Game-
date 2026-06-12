@@ -63,8 +63,8 @@ interface GameBoardProps {
 }
 
 export default function GameBoard({ himPosition, herPosition, turn, himJoined, herJoined, himName, herName, messages, onSendMessage, currentPlayer, onRollDice, isRolling, diceResult, isMyTurn }: GameBoardProps) {
-  const himAvatar = '/avatars/him-avatar.jpg';
-  const herAvatar = '/avatars/her-avatar.jpg';
+  const himAvatar = '/avatars/him-avatar.svg';
+  const herAvatar = '/avatars/her-avatar.svg';
 
   const renderPlayer = (player: 'him' | 'her', position: number, targetPosition: number) => {
     if (player === 'him' && !himJoined) return null;

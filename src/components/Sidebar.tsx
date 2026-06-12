@@ -73,7 +73,7 @@ export default function Sidebar({
               <img
                 alt="他"
                 className="h-full w-full object-cover"
-                src="/avatars/him-avatar.jpg"
+                src="/avatars/him-avatar.svg"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[var(--text-tertiary)] text-xs">等待</div>
@@ -120,7 +120,7 @@ export default function Sidebar({
               <img
                 alt="她"
                 className="h-full w-full object-cover"
-                src="/avatars/her-avatar.jpg"
+                src="/avatars/her-avatar.svg"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[var(--text-tertiary)] text-xs">等待</div>
