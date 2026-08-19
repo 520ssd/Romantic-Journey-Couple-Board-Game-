@@ -127,8 +127,8 @@ export default function GameBoard({
     // 判断是否是起点/终点
     const isStart = num === 1;
     const isFinish = num === 32;
-    // 判断当前格子上是否有玩家
-    const isOccupied = himPosition === num || herPosition === num;
+    // 判断当前位置是否有玩家
+    const isActive = himPosition === num || herPosition === num;
 
     return (
       <div
@@ -138,16 +138,12 @@ export default function GameBoard({
           w-full h-full min-h-[60px] md:min-h-[80px] 
           relative transition-all duration-300 ease-in-out
           flex flex-col items-center justify-center 
-          rounded-2xl
-          
-          /* 核心魔法：毛玻璃质感 */
-          ${bgClass} bg-white/40 backdrop-blur-sm border border-white/60 shadow-sm
-
-          /* 悬停效果 */
-          hover:shadow-md hover:-translate-y-1
-
-          /* 核心魔法：玩家所在位置的呼吸灯高亮 */
-          ${isOccupied ? 'animate-pulse border-2 border-[#ee2b4b] shadow-[0_0_20px_rgba(238,43,75,0.6)] bg-white/60' : ''}
+          rounded-2xl border-b-4 border-slate-200
+          /* 保持原本底色，叠加极白半透明和微弱的白边框，实现模糊高级感 */
+          ${bgClass} bg-white/30 mix-blend-multiply backdrop-blur-[2px] border-x border-white/30
+          hover:scale-[1.02] hover:shadow-md
+          /* 玩家所在的格子：变成粉红边框 + 呼吸粉光 */
+          ${isActive ? 'border-2 !border-[#ee2b4b] shadow-[0_0_20px_rgba(238,43,75,0.6)] animate-pulse bg-white/60 z-10' : ''}
         `}
       >
         {isStart && (
