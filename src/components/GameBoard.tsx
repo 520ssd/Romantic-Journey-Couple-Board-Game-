@@ -62,7 +62,22 @@ interface GameBoardProps {
   isMyTurn?: boolean;
 }
 
-export default function GameBoard({ himPosition, herPosition, turn, himJoined, herJoined, himName, herName, messages, onSendMessage, currentPlayer, onRollDice, isRolling, diceResult, isMyTurn }: GameBoardProps) {
+export default function GameBoard({ 
+  himPosition, 
+  herPosition, 
+  turn, 
+  himJoined, 
+  herJoined, 
+  himName, 
+  herName, 
+  messages, 
+  onSendMessage, 
+  currentPlayer, 
+  onRollDice, 
+  isRolling, 
+  diceResult, 
+  isMyTurn 
+}: GameBoardProps) {
   const himAvatar = '/avatars/him-avatar.svg';
   const herAvatar = '/avatars/her-avatar.svg';
 
@@ -109,59 +124,79 @@ export default function GameBoard({ himPosition, herPosition, turn, himJoined, h
     type: TileType,
     bgClass: string
   ) => {
+    // 判断是否是起点/终点
+    const isStart = num === 1;
+    const isFinish = num === 32;
+    // 判断当前格子上是否有玩家
+    const isOccupied = himPosition === num || herPosition === num;
+
     return (
       <div
         key={num}
         style={getTileStyle(num)}
-        className={`w-full h-full min-h-[60px] md:min-h-[80px] ${bgClass} rounded-2xl flex flex-col items-center justify-center border-b-4 border-slate-200 relative transition-transform hover:-translate-y-1 shadow-sm`}
+        className={`
+          w-full h-full min-h-[60px] md:min-h-[80px] 
+          relative transition-all duration-300 ease-in-out
+          flex flex-col items-center justify-center 
+          rounded-2xl
+          
+          /* 核心魔法：毛玻璃质感 */
+          ${bgClass} bg-white/40 backdrop-blur-sm border border-white/60 shadow-sm
+
+          /* 悬停效果 */
+          hover:shadow-md hover:-translate-y-1
+
+          /* 核心魔法：玩家所在位置的呼吸灯高亮 */
+          ${isOccupied ? 'animate-pulse border-2 border-[#ee2b4b] shadow-[0_0_20px_rgba(238,43,75,0.6)] bg-white/60' : ''}
+        `}
       >
-        {num === 1 && (
-          <div className="absolute -top-3 -left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm z-30">
+        {isStart && (
+          <div className="absolute -top-3 -left-3 bg-[#ee2b4b] text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm z-30">
             <Play className="w-3 h-3 fill-white" /> 起点
           </div>
         )}
-        {num === 32 && (
+        {isFinish && (
           <div className="absolute -top-3 -left-3 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm z-30">
             <Flag className="w-3 h-3 fill-white" /> 终点
           </div>
         )}
         
-        <span className="absolute top-1 left-2 text-[10px] font-bold opacity-30">{num}</span>
+        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-400/60">{num}</span>
         
         {type === 'heart' && (
           <>
-            <Heart className="text-primary w-5 h-5 md:w-7 md:h-7 fill-primary" />
-            <span className="text-[9px] md:text-[10px] font-bold text-primary mt-1">心动</span>
+            <Heart className="text-[#ee2b4b] w-5 h-5 md:w-7 md:h-7 fill-[#ee2b4b]" />
+            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">心动</span>
           </>
         )}
         {type === 'coin' && (
           <>
             <CircleDollarSign className="text-emerald-500 w-5 h-5 md:w-7 md:h-7 fill-emerald-500" />
-            <span className="text-[9px] md:text-[10px] font-bold text-emerald-600 mt-1">奖励</span>
+            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">奖励</span>
           </>
         )}
         {type === 'shop' && (
           <>
             <Store className="text-blue-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-blue-600 mt-1">商店</span>
+            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">商店</span>
           </>
         )}
         {type === 'quiz' && (
           <>
             <HelpCircle className="text-purple-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-purple-600 mt-1">默契</span>
+            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">默契</span>
           </>
         )}
         {type === 'fate' && (
           <>
             <Shuffle className="text-amber-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-amber-600 mt-1">命运</span>
+            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">命运</span>
           </>
         )}
         {type === 'finish' && (
           <>
             <Flag className="text-yellow-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-yellow-600 mt-1">终点</span>
+            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">终点</span>
           </>
         )}
         {renderPlayer('her', herPosition, num)}
@@ -202,9 +237,9 @@ export default function GameBoard({ himPosition, herPosition, turn, himJoined, h
                   <button
                     onClick={onRollDice}
                     disabled={!isMyTurn || isRolling}
-                    className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-md flex items-center justify-center gap-2
+                    className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 shadow-md flex items-center justify-center gap-2
                       ${isMyTurn && !isRolling 
-                        ? 'bg-primary text-white hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5' 
+                        ? 'bg-[#ee2b4b] text-white hover:bg-[#d4203d] hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:bg-[#b01a33]' 
                         : 'bg-slate-300 text-slate-500 cursor-not-allowed'}
                     `}
                   >

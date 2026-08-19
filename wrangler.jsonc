@@ -1,11 +1,14 @@
-// wrangler.jsonc 示例
 {
-  "name": "my-romantic-journey",
-  "main": "src/index.ts", // 你的后端入口文件
-  "compatibility_flags": ["nodejs_compat"], // 关键，让 Worker 支持 Express
+  "name": "romantic-journey",
+  "main": "src/index.ts",  // 或者 "worker/index.ts"
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist", // 你的前端构建输出目录
+    "directory": "./dist",  // 前端构建产物
     "binding": "ASSETS"
+  },
+  "vars": {
+    // 你的 AI API Keys
+    "DEEPSEEK_API_KEY": "your-key-here",
+    "GLM_API_KEY": "your-key-here"
   }
-  // ... 其他配置，如环境变量
 }
