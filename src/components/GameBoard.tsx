@@ -88,8 +88,8 @@ export default function GameBoard({
     return (
       <div
         className={`absolute ${
-          player === 'him' ? '-top-4 -right-4' : '-bottom-4 -left-4'
-        } h-12 w-12 rounded-full border-[3px] border-white shadow-[0_4px_12px_rgba(0,0,0,0.2)] z-30 overflow-hidden bg-white transition-all duration-500 hover:scale-110`}
+          player === 'him' ? '-top-2 -right-2 md:-top-3 md:-right-3' : '-bottom-2 -left-2 md:-bottom-3 md:-left-3'
+        } h-8 w-8 md:h-12 md:w-12 rounded-full border-2 border-white shadow-[0_4px_12px_rgba(0,0,0,0.2)] z-30 overflow-hidden bg-white transition-all duration-500`}
       >
         <img
           alt={player === 'him' ? '他' : '她'}
@@ -133,89 +133,89 @@ export default function GameBoard({
         key={num}
         style={getTileStyle(num)}
         className={`
-          w-full h-full min-h-[60px] md:min-h-[80px] 
+          w-full h-full min-h-[40px] md:min-h-[80px] 
           relative transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
           flex flex-col items-center justify-center 
           
-          /* 核心糖果风：超大圆角 + 微积木厚度 */
-          rounded-3xl 
-          border-b-[4px] border-r-[2px] border-black/10
-          
-          /* 顶部微光 */
-          shadow-[inset_0_2px_6px_rgba(255,255,255,0.7),0_4px_10px_rgba(0,0,0,0.05)]
-          
-          /* 保持底色 */
+          rounded-2xl md:rounded-3xl
+          border-b-[3px] md:border-b-[4px] border-r-[2px] border-black/10
+          shadow-[inset_0_2px_6px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.05)]
           ${bgClass} 
           
-          /* 悬停时微微抬起 */
           hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-1
           
-          /* ⭐ 核心要求：走到格子时的立体悬浮 (抬起 + 放大 + 漂浮) */
           ${isActive ? `
-            translate-y-[-12px] scale-105 z-20
-            shadow-[0_16px_32px_rgba(0,0,0,0.25),0_0_0_2px_rgba(255,255,255,0.8)]
-            border-b-[4px] border-primary
+            translate-y-[-6px] md:translate-y-[-12px] scale-105 z-20
+            shadow-[0_8px_20px_rgba(0,0,0,0.2),0_0_0_2px_rgba(255,255,255,0.8)]
+            border-b-[3px] border-primary
             animate-[float_2s_ease-in-out_infinite]
           ` : ''}
         `}
       >
-        {/* 定义悬浮动画（放在 div 里面作为局部样式） */}
         {isActive && (
           <style>{`
             @keyframes float {
-              0%, 100% { transform: translateY(-12px) scale(1.05); }
-              50% { transform: translateY(-20px) scale(1.08); }
+              0%, 100% { transform: translateY(-6px) scale(1.05); }
+              50% { transform: translateY(-10px) scale(1.08); }
+            }
+            @media (min-width: 768px) {
+              @keyframes float {
+                0%, 100% { transform: translateY(-12px) scale(1.05); }
+                50% { transform: translateY(-20px) scale(1.08); }
+              }
             }
           `}</style>
         )}
 
+        {/* 🚨 核心修复：手机端将标签改放在格子内部防止溢出 */}
         {isStart && (
-          <div className="absolute -top-3 -left-3 bg-[#ee2b4b] text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md z-30">
-            <Play className="w-3 h-3 fill-white" /> 起点
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 md:-top-3 md:-left-3 bg-[#ee2b4b] text-white text-[8px] md:text-[10px] font-bold px-2 md:px-2 py-0.5 md:py-1 rounded-full flex items-center gap-1 shadow-md z-30 scale-90 md:scale-100">
+            <Play className="w-2 h-2 md:w-3 md:h-3 fill-white" /> 起点
           </div>
         )}
         {isFinish && (
-          <div className="absolute -top-3 -left-3 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md z-30">
-            <Flag className="w-3 h-3 fill-white" /> 终点
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 md:-top-3 md:-left-3 bg-slate-800 text-white text-[8px] md:text-[10px] font-bold px-2 md:px-2 py-0.5 md:py-1 rounded-full flex items-center gap-1 shadow-md z-30 scale-90 md:scale-100">
+            <Flag className="w-2 h-2 md:w-3 md:h-3 fill-white" /> 终点
           </div>
         )}
         
-        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-400/60">{num}</span>
+        <span className="absolute top-0.5 left-1 md:top-1 md:left-2 text-[6px] md:text-[10px] font-bold text-slate-400/60">{num}</span>
         
+        {/* 手机端隐藏文字/图标微小调整 */}
         {type === 'heart' && (
           <>
-            <Heart className="text-[#ee2b4b] w-5 h-5 md:w-7 md:h-7 fill-[#ee2b4b]" />
-            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">心动</span>
+            <Heart className="text-[#ee2b4b] w-3.5 h-3.5 md:w-7 md:h-7 fill-[#ee2b4b]" />
+            <span className="hidden md:block text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">心动</span>
           </>
         )}
         {type === 'coin' && (
           <>
-            <CircleDollarSign className="text-emerald-500 w-5 h-5 md:w-7 md:h-7 fill-emerald-500" />
-            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">奖励</span>
+            <CircleDollarSign className="text-emerald-500 w-3.5 h-3.5 md:w-7 md:h-7 fill-emerald-500" />
+            <span className="hidden md:block text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">奖励</span>
           </>
         )}
         {type === 'shop' && (
           <>
-            <Store className="text-blue-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">商店</span>
+            <Store className="text-blue-500 w-3.5 h-3.5 md:w-7 md:h-7" />
+            <span className="hidden md:block text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">商店</span>
           </>
         )}
         {type === 'quiz' && (
           <>
-            <HelpCircle className="text-purple-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">默契</span>
+            <HelpCircle className="text-purple-500 w-3.5 h-3.5 md:w-7 md:h-7" />
+            <span className="hidden md:block text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">默契</span>
           </>
         )}
         {type === 'fate' && (
           <>
-            <Shuffle className="text-amber-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">命运</span>
+            <Shuffle className="text-amber-500 w-3.5 h-3.5 md:w-7 md:h-7" />
+            <span className="hidden md:block text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">命运</span>
           </>
         )}
         {type === 'finish' && (
           <>
-            <Flag className="text-yellow-500 w-5 h-5 md:w-7 md:h-7" />
-            <span className="text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">终点</span>
+            <Flag className="text-yellow-500 w-3.5 h-3.5 md:w-7 md:h-7" />
+            <span className="hidden md:block text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">终点</span>
           </>
         )}
         {renderPlayer('her', herPosition, num)}
@@ -225,18 +225,20 @@ export default function GameBoard({
   };
 
   return (
-    <section className="flex-1 order-1 lg:order-2">
-      <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-12 relative overflow-hidden min-h-[600px] flex items-center justify-center">
-        {/* 背景蜜桃色渐变图 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-pink-50 pointer-events-none"></div>
+    <section className="flex-1 order-1 lg:order-2 w-full">
+      <div className="bg-white rounded-3xl shadow-2xl p-2 md:p-12 relative overflow-hidden min-h-[500px] flex items-center justify-center border border-slate-100/80">
+        {/* 背景渐变 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-white to-pink-50/80 pointer-events-none"></div>
         
         <div className="relative w-full max-w-2xl mx-auto">
-          <div className="grid grid-cols-9 grid-rows-9 gap-2 md:gap-3 w-full aspect-square">
+          {/* 关键优化：在手机端缩小格子间隙，保证不溢出 */}
+          <div className="grid grid-cols-9 grid-rows-9 gap-[2px] md:gap-2 w-full aspect-square">
             {BOARD_TILES.map(tile => renderTile(tile.id, tile.type, tile.bgClass))}
             
-            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-3xl border-[3px] border-white/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.04)] p-4 md:p-6 shadow-xl gap-4 z-10">
+            {/* 内层聊天区域优化 */}
+            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-2xl md:rounded-3xl border-[2px] border-white/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.04)] p-2 md:p-6 shadow-xl gap-2 md:gap-4 z-10">
               {messages && onSendMessage && currentPlayer && (
-                <div className="w-full">
+                <div className="w-full h-full flex-1 flex flex-col justify-center">
                   <ChatPanel
                     messages={messages}
                     onSendMessage={onSendMessage}
@@ -245,11 +247,11 @@ export default function GameBoard({
                 </div>
               )}
               {onRollDice && isMyTurn !== undefined && (
-                <div className="w-full">
+                <div className="w-full mt-1 md:mt-0">
                   <button
                     onClick={onRollDice}
                     disabled={!isMyTurn || isRolling}
-                    className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 shadow-lg flex items-center justify-center gap-2
+                    className={`w-full py-2 md:py-4 px-4 md:px-6 rounded-xl md:rounded-xl font-bold text-sm md:text-lg transition-all duration-200 shadow-md flex items-center justify-center gap-2
                       ${isMyTurn && !isRolling 
                         ? 'bg-[#ee2b4b] text-white hover:bg-[#d4203d] hover:shadow-xl hover:-translate-y-0.5 active:scale-95 active:bg-[#b01a33]' 
                         : 'bg-slate-300 text-slate-500 cursor-not-allowed'}
@@ -257,12 +259,12 @@ export default function GameBoard({
                   >
                     {isRolling ? (
                       <>
-                        <Shuffle className="w-6 h-6 animate-spin" />
-                        掷骰子中... {diceResult !== null && `${diceResult}点`}
+                        <Shuffle className="w-4 h-4 md:w-6 md:h-6 animate-spin" />
+                        <span className="hidden xs:inline">掷骰子中...</span> {diceResult !== null && `${diceResult}点`}
                       </>
                     ) : (
                       <>
-                        <Shuffle className="w-6 h-6" />
+                        <Shuffle className="w-4 h-4 md:w-6 md:h-6" />
                         掷骰子
                       </>
                     )}
