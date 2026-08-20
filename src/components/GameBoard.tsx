@@ -137,19 +137,21 @@ export default function GameBoard({
           relative transition-all duration-300 ease-in-out
           flex flex-col items-center justify-center 
           
-          /* 1. 核心立体感：超圆角 + 从顶到底的渐变 (上浅下深) */
-          rounded-3xl border-b-[4px] border-white/20
-          bg-gradient-to-b from-white/90 via-white/50 to-transparent
+          /* 1. 积木感圆角 */
+          rounded-2xl
           
-          /* 2. 保留底色叠加 (用 mix-blend 让粉色/绿色透出来) */
-          ${bgClass} mix-blend-multiply
+          /* 2. 模拟厚度的边框 (上方浅色高光，下方深色阴影) */
+          border-b-[6px] border-r-[3px] border-black/5 
+          shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),0_6px_10px_rgba(0,0,0,0.15)]
           
-          /* 3. 外部阴影：让格子像是浮在棋盘上 */
-          shadow-[0_8px_24px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.04)]
-          hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] hover:-translate-y-1
+          /* 3. 保留色调 */
+          ${bgClass} 
           
-          /* 4. 玩家所在位置：强化的立体发光响应 */
-          ${isActive ? 'border-2 border-[#ee2b4b] shadow-[0_0_25px_rgba(238,43,75,0.7),0_8px_24px_rgba(238,43,75,0.15)] animate-pulse z-10 scale-[1.02]' : ''}
+          /* 4. 悬浮动态 */
+          hover:shadow-[0_12px_20px_rgba(0,0,0,0.2)] hover:-translate-y-1
+          
+          /* 5. 玩家位置发光 */
+          ${isActive ? 'border-[3px] border-[#ee2b4b] shadow-[0_0_25px_rgba(238,43,75,0.8),0_8px_16px_rgba(0,0,0,0.2)] animate-pulse z-10 scale-[1.05]' : ''}
         `}
       >
         {isStart && (
@@ -163,7 +165,7 @@ export default function GameBoard({
           </div>
         )}
         
-        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-400">{num}</span>
+        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-500/70">{num}</span>
         
         {type === 'heart' && (
           <>
@@ -210,7 +212,6 @@ export default function GameBoard({
   return (
     <section className="flex-1 order-1 lg:order-2">
       <div className="bg-[var(--bg-elevated)] rounded-3xl shadow-xl p-6 md:p-12 relative overflow-hidden min-h-[600px] flex items-center justify-center border border-primary/10 border-[var(--border-primary)]">
-        {/* Background decorative elements */}
         <div
           className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none"
           style={{
@@ -219,7 +220,6 @@ export default function GameBoard({
           }}
         ></div>
 
-        {/* Square Track Board */}
         <div className="relative w-full max-w-2xl mx-auto">
           <div className="grid grid-cols-9 grid-rows-9 gap-2 md:gap-3 w-full aspect-square">
             {BOARD_TILES.map(tile => renderTile(tile.id, tile.type, tile.bgClass))}
