@@ -89,7 +89,7 @@ export default function GameBoard({
       <div
         className={`absolute ${
           player === 'him' ? '-top-3 -right-3' : '-bottom-3 -left-3'
-        } h-10 w-10 rounded-full border-2 border-white border-[var(--border-primary)] shadow-md z-20 overflow-hidden bg-white bg-[var(--bg-tertiary)] transition-all duration-500`}
+        } h-10 w-10 rounded-full border-2 border-white shadow-xl z-30 overflow-hidden bg-white transition-all duration-500`}
       >
         <img
           alt={player === 'him' ? '他' : '她'}
@@ -124,10 +124,8 @@ export default function GameBoard({
     type: TileType,
     bgClass: string
   ) => {
-    // 判断是否是起点/终点
     const isStart = num === 1;
     const isFinish = num === 32;
-    // 判断当前位置是否有玩家
     const isActive = himPosition === num || herPosition === num;
 
     return (
@@ -138,26 +136,34 @@ export default function GameBoard({
           w-full h-full min-h-[60px] md:min-h-[80px] 
           relative transition-all duration-300 ease-in-out
           flex flex-col items-center justify-center 
-          rounded-2xl border-b-4 border-slate-200
-          /* 保持原本底色，叠加极白半透明和微弱的白边框，实现模糊高级感 */
-          ${bgClass} bg-white/30 mix-blend-multiply backdrop-blur-[2px] border-x border-white/30
-          hover:scale-[1.02] hover:shadow-md
-          /* 玩家所在的格子：变成粉红边框 + 呼吸粉光 */
-          ${isActive ? 'border-2 !border-[#ee2b4b] shadow-[0_0_20px_rgba(238,43,75,0.6)] animate-pulse bg-white/60 z-10' : ''}
+          
+          /* 1. 核心立体感：超圆角 + 从顶到底的渐变 (上浅下深) */
+          rounded-3xl border-b-[4px] border-white/20
+          bg-gradient-to-b from-white/90 via-white/50 to-transparent
+          
+          /* 2. 保留底色叠加 (用 mix-blend 让粉色/绿色透出来) */
+          ${bgClass} mix-blend-multiply
+          
+          /* 3. 外部阴影：让格子像是浮在棋盘上 */
+          shadow-[0_8px_24px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.04)]
+          hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] hover:-translate-y-1
+          
+          /* 4. 玩家所在位置：强化的立体发光响应 */
+          ${isActive ? 'border-2 border-[#ee2b4b] shadow-[0_0_25px_rgba(238,43,75,0.7),0_8px_24px_rgba(238,43,75,0.15)] animate-pulse z-10 scale-[1.02]' : ''}
         `}
       >
         {isStart && (
-          <div className="absolute -top-3 -left-3 bg-[#ee2b4b] text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm z-30">
+          <div className="absolute -top-3 -left-3 bg-[#ee2b4b] text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md z-30">
             <Play className="w-3 h-3 fill-white" /> 起点
           </div>
         )}
         {isFinish && (
-          <div className="absolute -top-3 -left-3 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm z-30">
+          <div className="absolute -top-3 -left-3 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md z-30">
             <Flag className="w-3 h-3 fill-white" /> 终点
           </div>
         )}
         
-        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-400/60">{num}</span>
+        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-400">{num}</span>
         
         {type === 'heart' && (
           <>
@@ -215,7 +221,7 @@ export default function GameBoard({
 
         {/* Square Track Board */}
         <div className="relative w-full max-w-2xl mx-auto">
-          <div className="grid grid-cols-9 grid-rows-9 gap-1 md:gap-2 w-full aspect-square">
+          <div className="grid grid-cols-9 grid-rows-9 gap-2 md:gap-3 w-full aspect-square">
             {BOARD_TILES.map(tile => renderTile(tile.id, tile.type, tile.bgClass))}
             
             <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-slate-50/50 bg-[var(--bg-tertiary)]/50 rounded-3xl border-2 border-dashed border-primary/20 border-[var(--border-primary)] p-4 md:p-6 shadow-inner gap-4">
@@ -233,9 +239,9 @@ export default function GameBoard({
                   <button
                     onClick={onRollDice}
                     disabled={!isMyTurn || isRolling}
-                    className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 shadow-md flex items-center justify-center gap-2
+                    className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 shadow-lg flex items-center justify-center gap-2
                       ${isMyTurn && !isRolling 
-                        ? 'bg-[#ee2b4b] text-white hover:bg-[#d4203d] hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:bg-[#b01a33]' 
+                        ? 'bg-[#ee2b4b] text-white hover:bg-[#d4203d] hover:shadow-xl hover:-translate-y-0.5 active:scale-95 active:bg-[#b01a33]' 
                         : 'bg-slate-300 text-slate-500 cursor-not-allowed'}
                     `}
                   >
