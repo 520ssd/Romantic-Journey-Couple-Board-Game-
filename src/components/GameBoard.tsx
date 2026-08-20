@@ -88,8 +88,8 @@ export default function GameBoard({
     return (
       <div
         className={`absolute ${
-          player === 'him' ? '-top-3 -right-3' : '-bottom-3 -left-3'
-        } h-10 w-10 rounded-full border-2 border-white shadow-xl z-30 overflow-hidden bg-white transition-all duration-500`}
+          player === 'him' ? '-top-4 -right-4' : '-bottom-4 -left-4'
+        } h-12 w-12 rounded-full border-[3px] border-white shadow-[0_4px_12px_rgba(0,0,0,0.2)] z-30 overflow-hidden bg-white transition-all duration-500 hover:scale-110`}
       >
         <img
           alt={player === 'him' ? '他' : '她'}
@@ -134,26 +134,41 @@ export default function GameBoard({
         style={getTileStyle(num)}
         className={`
           w-full h-full min-h-[60px] md:min-h-[80px] 
-          relative transition-all duration-300 ease-in-out
+          relative transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
           flex flex-col items-center justify-center 
           
-          /* 1. 积木感圆角 */
-          rounded-2xl
+          /* 核心糖果风：超大圆角 + 微积木厚度 */
+          rounded-3xl 
+          border-b-[4px] border-r-[2px] border-black/10
           
-          /* 2. 模拟厚度的边框 (上方浅色高光，下方深色阴影) */
-          border-b-[6px] border-r-[3px] border-black/5 
-          shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),0_6px_10px_rgba(0,0,0,0.15)]
+          /* 顶部微光 */
+          shadow-[inset_0_2px_6px_rgba(255,255,255,0.7),0_4px_10px_rgba(0,0,0,0.05)]
           
-          /* 3. 保留色调 */
+          /* 保持底色 */
           ${bgClass} 
           
-          /* 4. 悬浮动态 */
-          hover:shadow-[0_12px_20px_rgba(0,0,0,0.2)] hover:-translate-y-1
+          /* 悬停时微微抬起 */
+          hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-1
           
-          /* 5. 玩家位置发光 */
-          ${isActive ? 'border-[3px] border-[#ee2b4b] shadow-[0_0_25px_rgba(238,43,75,0.8),0_8px_16px_rgba(0,0,0,0.2)] animate-pulse z-10 scale-[1.05]' : ''}
+          /* ⭐ 核心要求：走到格子时的立体悬浮 (抬起 + 放大 + 漂浮) */
+          ${isActive ? `
+            translate-y-[-12px] scale-105 z-20
+            shadow-[0_16px_32px_rgba(0,0,0,0.25),0_0_0_2px_rgba(255,255,255,0.8)]
+            border-b-[4px] border-primary
+            animate-[float_2s_ease-in-out_infinite]
+          ` : ''}
         `}
       >
+        {/* 定义悬浮动画（放在 div 里面作为局部样式） */}
+        {isActive && (
+          <style>{`
+            @keyframes float {
+              0%, 100% { transform: translateY(-12px) scale(1.05); }
+              50% { transform: translateY(-20px) scale(1.08); }
+            }
+          `}</style>
+        )}
+
         {isStart && (
           <div className="absolute -top-3 -left-3 bg-[#ee2b4b] text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md z-30">
             <Play className="w-3 h-3 fill-white" /> 起点
@@ -165,7 +180,7 @@ export default function GameBoard({
           </div>
         )}
         
-        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-500/70">{num}</span>
+        <span className="absolute top-1 left-2 text-[10px] font-bold text-slate-400/60">{num}</span>
         
         {type === 'heart' && (
           <>
@@ -211,20 +226,15 @@ export default function GameBoard({
 
   return (
     <section className="flex-1 order-1 lg:order-2">
-      <div className="bg-[var(--bg-elevated)] rounded-3xl shadow-xl p-6 md:p-12 relative overflow-hidden min-h-[600px] flex items-center justify-center border border-primary/10 border-[var(--border-primary)]">
-        <div
-          className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(#ee2b4b 1px, transparent 0)',
-            backgroundSize: '40px 40px',
-          }}
-        ></div>
-
+      <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-12 relative overflow-hidden min-h-[600px] flex items-center justify-center">
+        {/* 背景蜜桃色渐变图 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-pink-50 pointer-events-none"></div>
+        
         <div className="relative w-full max-w-2xl mx-auto">
           <div className="grid grid-cols-9 grid-rows-9 gap-2 md:gap-3 w-full aspect-square">
             {BOARD_TILES.map(tile => renderTile(tile.id, tile.type, tile.bgClass))}
             
-            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-slate-50/50 bg-[var(--bg-tertiary)]/50 rounded-3xl border-2 border-dashed border-primary/20 border-[var(--border-primary)] p-4 md:p-6 shadow-inner gap-4">
+            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-3xl border-[3px] border-white/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.04)] p-4 md:p-6 shadow-xl gap-4 z-10">
               {messages && onSendMessage && currentPlayer && (
                 <div className="w-full">
                   <ChatPanel
