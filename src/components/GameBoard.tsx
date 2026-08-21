@@ -137,7 +137,7 @@ export default function GameBoard({
           relative transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
           flex flex-col items-center justify-center 
           
-          /* 立体感：圆角、厚度、内部高光 */
+          /* 立体感 */
           rounded-2xl md:rounded-3xl
           border-b-[3px] md:border-b-[4px] border-r-[2px] border-black/5
           shadow-[inset_0_2px_6px_rgba(255,255,255,0.9),0_6px_16px_rgba(236,72,153,0.12)]
@@ -170,7 +170,7 @@ export default function GameBoard({
           `}</style>
         )}
 
-        {/* 起点/终点标签（手机版居中防溢出） */}
+        {/* 起点/终点标签 */}
         {isStart && (
           <div className="absolute -top-1 left-1/2 -translate-x-1/2 md:-top-3 md:-left-3 bg-[#ec4899] text-white text-[8px] md:text-[10px] font-bold px-2 md:px-2 py-0.5 md:py-1 rounded-full flex items-center gap-1 shadow-md z-30 scale-90 md:scale-100">
             <Play className="w-2 h-2 md:w-3 md:h-3 fill-white" /> 起点
@@ -184,7 +184,6 @@ export default function GameBoard({
         
         <span className="absolute top-0.5 left-1 md:top-1 md:left-2 text-[6px] md:text-[10px] font-bold text-slate-400/60">{num}</span>
         
-        {/* 图标增加跳动动画 */}
         {type === 'heart' && (
           <>
             <Heart className="heartbeat text-[#ec4899] w-3.5 h-3.5 md:w-7 md:h-7 fill-[#ec4899]" />
@@ -228,8 +227,33 @@ export default function GameBoard({
   };
 
   return (
-    <section className="flex-1 order-1 lg:order-2 w-full">
-      {/* 外层容器升级：加入背景渐变圆角和柔光 */}
+    <section className="flex-1 order-1 lg:order-2 w-full relative">
+      {/* 巨大的 3D 骰子动画 (只在掷骰子时出现) */}
+      {isRolling && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
+          {/* 黑色半透明遮罩 */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+          
+          {/* 巨大的 3D 骰子 */}
+          <div className="relative z-10 cube-container">
+            <div className="cube">
+              <div className="face front"><span>{diceResult || 6}</span></div>
+              <div className="face back"><span>{diceResult || 1}</span></div>
+              <div className="face right"><span>{diceResult || 3}</span></div>
+              <div className="face left"><span>{diceResult || 4}</span></div>
+              <div className="face top"><span>{diceResult || 2}</span></div>
+              <div className="face bottom"><span>{diceResult || 5}</span></div>
+            </div>
+          </div>
+          
+          {/* 掷骰子提示文字 */}
+          <div className="absolute bottom-20 text-white text-2xl font-bold tracking-widest drop-shadow-lg">
+            命运转动中...
+          </div>
+        </div>
+      )}
+
+      {/* 外层容器 */}
       <div className="bg-white rounded-3xl shadow-xl p-2 md:p-12 relative overflow-hidden min-h-[500px] flex items-center justify-center border border-[#fbcfe8]">
         {/* 粉色梦幻背景 */}
         <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-white to-purple-50/80 pointer-events-none"></div>
@@ -239,7 +263,7 @@ export default function GameBoard({
           <div className="grid grid-cols-9 grid-rows-9 gap-[2px] md:gap-2 w-full aspect-square">
             {BOARD_TILES.map(tile => renderTile(tile.id, tile.type, tile.bgClass))}
             
-            {/* 聊天区域：磨砂玻璃质感 */}
+            {/* 聊天区域 */}
             <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/70 backdrop-blur-md rounded-2xl md:rounded-3xl border-[2px] border-white/80 shadow-[inset_0_4px_12px_rgba(236,72,153,0.08)] p-2 md:p-6 shadow-xl gap-2 md:gap-4 z-10">
               {messages && onSendMessage && currentPlayer && (
                 <div className="w-full h-full flex-1 flex flex-col justify-center">
@@ -252,7 +276,6 @@ export default function GameBoard({
               )}
               {onRollDice && isMyTurn !== undefined && (
                 <div className="w-full mt-1 md:mt-0">
-                  {/* 掷骰子按钮：加入流光扫过动画 */}
                   <button
                     onClick={onRollDice}
                     disabled={!isMyTurn || isRolling}
@@ -265,7 +288,7 @@ export default function GameBoard({
                     {isRolling ? (
                       <>
                         <Shuffle className="w-4 h-4 md:w-6 md:h-6 animate-spin" />
-                        <span className="hidden xs:inline">掷骰子中...</span> {diceResult !== null && `${diceResult}点`}
+                        <span className="hidden xs:inline">掷骰子中...</span>
                       </>
                     ) : (
                       <>
@@ -280,6 +303,73 @@ export default function GameBoard({
           </div>
         </div>
       </div>
+
+      {/* 引入3D骰子所需的CSS样式 */}
+      <style>{`
+        .cube-container {
+          width: 160px;
+          height: 160px;
+          perspective: 800px;
+          animation: diceDropIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        .cube {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          transform-style: preserve-3d;
+          transform: rotateX(-20deg) rotateY(-30deg);
+          animation: diceSpin 1.2s ease-in-out infinite;
+        }
+
+        .face {
+          position: absolute;
+          width: 160px;
+          height: 160px;
+          background: linear-gradient(145deg, #ffffff, #fbcfe8);
+          border: 4px solid white;
+          border-radius: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: inset 0 0 20px rgba(236, 72, 153, 0.15);
+        }
+
+        .face span {
+          font-size: 64px;
+          font-weight: 900;
+          color: #ec4899;
+          text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
+        }
+
+        .front  { transform: rotateY(0deg) translateZ(80px); }
+        .back   { transform: rotateY(180deg) translateZ(80px); }
+        .right  { transform: rotateY(90deg) translateZ(80px); }
+        .left   { transform: rotateY(-90deg) translateZ(80px); }
+        .top    { transform: rotateX(90deg) translateZ(80px); }
+        .bottom { transform: rotateX(-90deg) translateZ(80px); }
+
+        @keyframes diceSpin {
+          0% { transform: rotateX(0deg) rotateY(0deg) scale(0.5); }
+          100% { transform: rotateX(360deg) rotateY(360deg) scale(1); }
+        }
+
+        @keyframes diceDropIn {
+          0% { transform: scale(3) translateY(-100px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+          .cube-container, .face { width: 120px; height: 120px; }
+          .face span { font-size: 48px; }
+          .front  { transform: rotateY(0deg) translateZ(60px); }
+          .back   { transform: rotateY(180deg) translateZ(60px); }
+          .right  { transform: rotateY(90deg) translateZ(60px); }
+          .left   { transform: rotateY(-90deg) translateZ(60px); }
+          .top    { transform: rotateX(90deg) translateZ(60px); }
+          .bottom { transform: rotateX(-90deg) translateZ(60px); }
+        }
+      `}</style>
     </section>
   );
 }
