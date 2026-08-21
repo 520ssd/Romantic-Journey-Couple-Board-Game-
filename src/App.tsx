@@ -438,10 +438,10 @@ export default function App() {
       <RewardModal
         isOpen={activeModal === 'reward'}
         onClose={() => {
-          socket.emit('addCoins', { roomId, role, amount: 50, reason: '获得奖励' });
+          socket.emit('addCoins', { roomId, role, amount: 10, reason: '获得奖励' });
           handleCloseModal();
         }}
-        amount={50}
+        amount={10}
         isReadOnly={modalPlayer !== role}
       />
 

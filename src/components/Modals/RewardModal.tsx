@@ -13,9 +13,10 @@ export default function RewardModal({ isOpen, onClose, amount, isReadOnly }: Rew
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
       {/* Main Popup Container */}
-      <div className="relative w-full max-w-[480px] bg-white bg-[var(--bg-elevated)] rounded-xl shadow-2xl overflow-hidden border border-primary/10 border-[var(--border-primary)] animate-in fade-in zoom-in duration-200">
-        {/* Festive Top Section with Gradient Background */}
-        <div className="relative h-64 w-full bg-gradient-to-b from-[#ec5b13]/20 to-transparent from-[#ec5b13]/10 flex flex-col items-center justify-center overflow-hidden">
+      <div className="relative w-full max-w-[480px] bg-white bg-[var(--bg-elevated)] rounded-3xl shadow-2xl overflow-hidden border border-primary/10 border-[var(--border-primary)] animate-in fade-in zoom-in duration-200">
+        
+        {/* Festive Top Section with Gradient Background (修复了重复的 from 和 to) */}
+        <div className="relative h-64 w-full bg-gradient-to-b from-[#ec5b13]/25 to-transparent flex flex-col items-center justify-center overflow-hidden">
           {/* Sparkle Background Decorative Icons */}
           <Sparkles className="absolute top-10 left-10 text-[#ec5b13]/30 w-10 h-10" />
           <Star className="absolute bottom-12 right-12 text-[#ec5b13]/40 w-8 h-8 fill-[#ec5b13]/40" />
@@ -26,10 +27,10 @@ export default function RewardModal({ isOpen, onClose, amount, isReadOnly }: Rew
             {/* Coin Glow */}
             <div className="absolute w-40 h-40 bg-[#ec5b13]/20 rounded-full blur-3xl"></div>
             {/* The Main Coin */}
-            <div className="relative w-32 h-32 bg-gradient-to-tr from-[#ec5b13] to-yellow-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white/30">
+            <div className="relative w-32 h-32 bg-gradient-to-tr from-[#ec5b13] to-yellow-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white/30 animate-bounce [animation-duration:2s]">
               <CircleDollarSign className="text-white w-20 h-20" />
               {/* Sparkle Overlays */}
-              <Sparkles className="absolute -top-2 -right-2 text-white w-6 h-6 drop-shadow-md" />
+              <Sparkles className="absolute -top-2 -right-2 text-white w-6 h-6 drop-shadow-md animate-pulse" />
             </div>
           </div>
 
@@ -43,11 +44,12 @@ export default function RewardModal({ isOpen, onClose, amount, isReadOnly }: Rew
 
         {/* Text Content Area */}
         <div className="px-8 pb-8 pt-2 flex flex-col items-center text-center">
+          {/* 修改了标题和文案，更加符合情侣游戏的语境 */}
           <h1 className="text-4xl font-extrabold text-slate-900 text-[var(--text-primary)] tracking-tight mb-2">
             +{amount} 金币
           </h1>
           <p className="text-slate-600 text-[var(--text-tertiary)] text-lg leading-relaxed mb-8">
-            运气不错！你获得了一份特别奖励。
+            给你的恋爱基金充个值！
           </p>
 
           {/* Progress Bar / Visual Detail */}
@@ -62,7 +64,7 @@ export default function RewardModal({ isOpen, onClose, amount, isReadOnly }: Rew
                 onClick={onClose}
                 className="group relative w-full flex items-center justify-center h-14 bg-[#ec5b13] hover:bg-[#ec5b13]/90 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-[#ec5b13]/25 active:scale-[0.98]"
               >
-                <span className="truncate">太棒了！</span>
+                <span className="truncate">收下这笔钱！</span>
                 <Heart className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform fill-white" />
               </button>
 
@@ -76,7 +78,7 @@ export default function RewardModal({ isOpen, onClose, amount, isReadOnly }: Rew
             </>
           ) : (
             <div className="text-center text-sm font-bold text-slate-500 text-[var(--text-tertiary)] py-3">
-              等待对方领取奖励...
+              等 TA 回过神来，拿走这笔奖励...
             </div>
           )}
         </div>
