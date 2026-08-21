@@ -89,7 +89,7 @@ export default function GameBoard({
       <div
         className={`absolute ${
           player === 'him' ? '-top-2 -right-2 md:-top-3 md:-right-3' : '-bottom-2 -left-2 md:-bottom-3 md:-left-3'
-        } h-8 w-8 md:h-12 md:w-12 rounded-full border-2 border-white shadow-[0_4px_12px_rgba(236,72,153,0.3)] z-30 overflow-hidden bg-white transition-all duration-500`}
+        } h-8 w-8 md:h-12 md:w-12 rounded-full border-[3px] border-white shadow-[0_4px_12px_rgba(236,72,153,0.5)] z-30 overflow-hidden bg-white transition-all duration-500 hover:scale-110`}
       >
         <img
           alt={player === 'him' ? '他' : '她'}
@@ -170,14 +170,14 @@ export default function GameBoard({
           `}</style>
         )}
 
-        {/* 起点/终点标签 */}
+        {/* 起点/终点 立体徽章 */}
         {isStart && (
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 md:-top-3 md:-left-3 bg-[#ec4899] text-white text-[8px] md:text-[10px] font-bold px-2 md:px-2 py-0.5 md:py-1 rounded-full flex items-center gap-1 shadow-md z-30 scale-90 md:scale-100">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 md:-top-5 md:-left-4 bg-gradient-to-r from-[#ec4899] to-[#f472b6] text-white text-[8px] md:text-xs font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-pink-500/40 border-2 border-white/60 z-30 scale-90 md:scale-100 animate-bounce">
             <Play className="w-2 h-2 md:w-3 md:h-3 fill-white" /> 起点
           </div>
         )}
         {isFinish && (
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 md:-top-3 md:-left-3 bg-slate-800 text-white text-[8px] md:text-[10px] font-bold px-2 md:px-2 py-0.5 md:py-1 rounded-full flex items-center gap-1 shadow-md z-30 scale-90 md:scale-100">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 md:-top-5 md:-left-4 bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[8px] md:text-xs font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-amber-500/40 border-2 border-white/60 z-30 scale-90 md:scale-100 animate-bounce">
             <Flag className="w-2 h-2 md:w-3 md:h-3 fill-white" /> 终点
           </div>
         )}
@@ -232,7 +232,7 @@ export default function GameBoard({
       {isRolling && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
           {/* 黑色半透明遮罩 */}
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-md"></div>
           
           {/* 巨大的 3D 骰子 */}
           <div className="relative z-10 cube-container">
@@ -244,6 +244,8 @@ export default function GameBoard({
               <div className="face top"><span>{diceResult || 2}</span></div>
               <div className="face bottom"><span>{diceResult || 5}</span></div>
             </div>
+            {/* 骰子下方的投影光环 */}
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-8 bg-[#ec4899] opacity-40 rounded-[100%] blur-md"></div>
           </div>
           
           {/* 掷骰子提示文字 */}
@@ -253,18 +255,21 @@ export default function GameBoard({
         </div>
       )}
 
-      {/* 外层容器 */}
-      <div className="bg-white rounded-3xl shadow-xl p-2 md:p-12 relative overflow-hidden min-h-[500px] flex items-center justify-center border border-[#fbcfe8]">
-        {/* 粉色梦幻背景 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-white to-purple-50/80 pointer-events-none"></div>
+      {/* 外层容器：全部改为大厂手游最爱的磨砂玻璃（Glassmorphism）质感 */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-2xl p-2 md:p-12 relative overflow-hidden min-h-[500px] flex items-center justify-center border border-white/80 shadow-[0_20px_50px_rgba(236,72,153,0.15)]">
+        
+        {/* 背景粉紫渐变 + 动态光晕 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-100/60 via-white/40 to-purple-100/60 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-pink-300/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-300/20 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
         
         <div className="relative w-full max-w-2xl mx-auto">
           {/* 棋盘网格 */}
           <div className="grid grid-cols-9 grid-rows-9 gap-[2px] md:gap-2 w-full aspect-square">
             {BOARD_TILES.map(tile => renderTile(tile.id, tile.type, tile.bgClass))}
             
-            {/* 聊天区域 */}
-            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/70 backdrop-blur-md rounded-2xl md:rounded-3xl border-[2px] border-white/80 shadow-[inset_0_4px_12px_rgba(236,72,153,0.08)] p-2 md:p-6 shadow-xl gap-2 md:gap-4 z-10">
+            {/* 聊天区域：升级为超级通透的高端磨砂玻璃 */}
+            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/50 backdrop-blur-lg rounded-2xl md:rounded-3xl border-[2px] border-white/80 shadow-[inset_0_4px_12px_rgba(236,72,153,0.08)] p-2 md:p-6 shadow-xl gap-2 md:gap-4 z-10">
               {messages && onSendMessage && currentPlayer && (
                 <div className="w-full h-full flex-1 flex flex-col justify-center">
                   <ChatPanel
@@ -281,8 +286,8 @@ export default function GameBoard({
                     disabled={!isMyTurn || isRolling}
                     className={`shimmer-button w-full py-2 md:py-4 px-4 md:px-6 rounded-xl md:rounded-xl font-bold text-sm md:text-lg transition-all duration-200 shadow-lg flex items-center justify-center gap-2
                       ${isMyTurn && !isRolling 
-                        ? 'bg-[#ec4899] text-white hover:bg-[#db2777] hover:shadow-xl hover:-translate-y-0.5 active:scale-95 active:bg-[#be185d]' 
-                        : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}
+                        ? 'bg-gradient-to-r from-[#ec4899] to-[#db2777] text-white hover:shadow-2xl hover:shadow-pink-500/40 hover:-translate-y-0.5 active:scale-95' 
+                        : 'bg-slate-200/80 text-slate-400 cursor-not-allowed shadow-none'}
                     `}
                   >
                     {isRolling ? (
