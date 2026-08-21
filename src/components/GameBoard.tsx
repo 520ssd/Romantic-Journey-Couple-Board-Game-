@@ -89,7 +89,7 @@ export default function GameBoard({
       <div
         className={`absolute ${
           player === 'him' ? '-top-2 -right-2 md:-top-3 md:-right-3' : '-bottom-2 -left-2 md:-bottom-3 md:-left-3'
-        } h-8 w-8 md:h-12 md:w-12 rounded-full border-2 border-white shadow-[0_4px_12px_rgba(0,0,0,0.2)] z-30 overflow-hidden bg-white transition-all duration-500`}
+        } h-8 w-8 md:h-12 md:w-12 rounded-full border-2 border-white shadow-[0_4px_12px_rgba(236,72,153,0.3)] z-30 overflow-hidden bg-white transition-all duration-500`}
       >
         <img
           alt={player === 'him' ? '他' : '她'}
@@ -137,17 +137,20 @@ export default function GameBoard({
           relative transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
           flex flex-col items-center justify-center 
           
+          /* 立体感：圆角、厚度、内部高光 */
           rounded-2xl md:rounded-3xl
-          border-b-[3px] md:border-b-[4px] border-r-[2px] border-black/10
-          shadow-[inset_0_2px_6px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.05)]
+          border-b-[3px] md:border-b-[4px] border-r-[2px] border-black/5
+          shadow-[inset_0_2px_6px_rgba(255,255,255,0.9),0_6px_16px_rgba(236,72,153,0.12)]
           ${bgClass} 
           
-          hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] hover:-translate-y-1
+          /* 悬浮效果 */
+          hover:shadow-[0_12px_24px_rgba(236,72,153,0.2)] hover:-translate-y-1
           
+          /* 玩家所在位置：立体悬浮 */
           ${isActive ? `
             translate-y-[-6px] md:translate-y-[-12px] scale-105 z-20
-            shadow-[0_8px_20px_rgba(0,0,0,0.2),0_0_0_2px_rgba(255,255,255,0.8)]
-            border-b-[3px] border-primary
+            shadow-[0_8px_20px_rgba(236,72,153,0.3),0_0_0_2px_rgba(255,255,255,0.9)]
+            border-b-[3px] border-[#ec4899]
             animate-[float_2s_ease-in-out_infinite]
           ` : ''}
         `}
@@ -167,9 +170,9 @@ export default function GameBoard({
           `}</style>
         )}
 
-        {/* 🚨 核心修复：手机端将标签改放在格子内部防止溢出 */}
+        {/* 起点/终点标签（手机版居中防溢出） */}
         {isStart && (
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 md:-top-3 md:-left-3 bg-[#ee2b4b] text-white text-[8px] md:text-[10px] font-bold px-2 md:px-2 py-0.5 md:py-1 rounded-full flex items-center gap-1 shadow-md z-30 scale-90 md:scale-100">
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 md:-top-3 md:-left-3 bg-[#ec4899] text-white text-[8px] md:text-[10px] font-bold px-2 md:px-2 py-0.5 md:py-1 rounded-full flex items-center gap-1 shadow-md z-30 scale-90 md:scale-100">
             <Play className="w-2 h-2 md:w-3 md:h-3 fill-white" /> 起点
           </div>
         )}
@@ -181,10 +184,10 @@ export default function GameBoard({
         
         <span className="absolute top-0.5 left-1 md:top-1 md:left-2 text-[6px] md:text-[10px] font-bold text-slate-400/60">{num}</span>
         
-        {/* 手机端隐藏文字/图标微小调整 */}
+        {/* 图标增加跳动动画 */}
         {type === 'heart' && (
           <>
-            <Heart className="text-[#ee2b4b] w-3.5 h-3.5 md:w-7 md:h-7 fill-[#ee2b4b]" />
+            <Heart className="heartbeat text-[#ec4899] w-3.5 h-3.5 md:w-7 md:h-7 fill-[#ec4899]" />
             <span className="hidden md:block text-[9px] md:text-[10px] font-bold text-slate-700 mt-1">心动</span>
           </>
         )}
@@ -226,17 +229,18 @@ export default function GameBoard({
 
   return (
     <section className="flex-1 order-1 lg:order-2 w-full">
-      <div className="bg-white rounded-3xl shadow-2xl p-2 md:p-12 relative overflow-hidden min-h-[500px] flex items-center justify-center border border-slate-100/80">
-        {/* 背景渐变 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-white to-pink-50/80 pointer-events-none"></div>
+      {/* 外层容器升级：加入背景渐变圆角和柔光 */}
+      <div className="bg-white rounded-3xl shadow-xl p-2 md:p-12 relative overflow-hidden min-h-[500px] flex items-center justify-center border border-[#fbcfe8]">
+        {/* 粉色梦幻背景 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-white to-purple-50/80 pointer-events-none"></div>
         
         <div className="relative w-full max-w-2xl mx-auto">
-          {/* 关键优化：在手机端缩小格子间隙，保证不溢出 */}
+          {/* 棋盘网格 */}
           <div className="grid grid-cols-9 grid-rows-9 gap-[2px] md:gap-2 w-full aspect-square">
             {BOARD_TILES.map(tile => renderTile(tile.id, tile.type, tile.bgClass))}
             
-            {/* 内层聊天区域优化 */}
-            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-2xl md:rounded-3xl border-[2px] border-white/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.04)] p-2 md:p-6 shadow-xl gap-2 md:gap-4 z-10">
+            {/* 聊天区域：磨砂玻璃质感 */}
+            <div className="col-start-2 col-span-7 row-start-2 row-span-7 flex flex-col items-center justify-center bg-white/70 backdrop-blur-md rounded-2xl md:rounded-3xl border-[2px] border-white/80 shadow-[inset_0_4px_12px_rgba(236,72,153,0.08)] p-2 md:p-6 shadow-xl gap-2 md:gap-4 z-10">
               {messages && onSendMessage && currentPlayer && (
                 <div className="w-full h-full flex-1 flex flex-col justify-center">
                   <ChatPanel
@@ -248,13 +252,14 @@ export default function GameBoard({
               )}
               {onRollDice && isMyTurn !== undefined && (
                 <div className="w-full mt-1 md:mt-0">
+                  {/* 掷骰子按钮：加入流光扫过动画 */}
                   <button
                     onClick={onRollDice}
                     disabled={!isMyTurn || isRolling}
-                    className={`w-full py-2 md:py-4 px-4 md:px-6 rounded-xl md:rounded-xl font-bold text-sm md:text-lg transition-all duration-200 shadow-md flex items-center justify-center gap-2
+                    className={`shimmer-button w-full py-2 md:py-4 px-4 md:px-6 rounded-xl md:rounded-xl font-bold text-sm md:text-lg transition-all duration-200 shadow-lg flex items-center justify-center gap-2
                       ${isMyTurn && !isRolling 
-                        ? 'bg-[#ee2b4b] text-white hover:bg-[#d4203d] hover:shadow-xl hover:-translate-y-0.5 active:scale-95 active:bg-[#b01a33]' 
-                        : 'bg-slate-300 text-slate-500 cursor-not-allowed'}
+                        ? 'bg-[#ec4899] text-white hover:bg-[#db2777] hover:shadow-xl hover:-translate-y-0.5 active:scale-95 active:bg-[#be185d]' 
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}
                     `}
                   >
                     {isRolling ? (
