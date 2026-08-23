@@ -23,9 +23,10 @@ export default function Header() {
         className="flex items-center justify-between whitespace-nowrap border-b px-6 py-4 shadow-sm sticky top-0 z-50 bg-[var(--bg-primary)] border-[var(--border-primary)]"
       >
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center p-2 bg-[var(--bg-pink)] rounded-lg">
+          <div className="flex items-center justify-center p-2 bg-[var(--bg-pink)] rounded-lg animate-pulse">
             <Heart className="text-pink-500 w-5 h-5 fill-pink-500" />
           </div>
+          {/* 👇 这里是你自定义标题的地方 */}
           <h2 className="text-xl font-bold leading-tight tracking-tight text-[var(--text-primary)]">
             陈洁娴，我爱你
           </h2>
