@@ -3,10 +3,10 @@ import { useToast } from '../Toast';
 
 const SHOP_ITEMS = [
   { id: 'remoteDice' as const, name: '遥控骰子', desc: '心之所向，指定下次点数', cost: 50, level: 1, icon: Dices, color: 'primary' },
-  { id: 'shield' as const, name: '甜心护盾', desc: '温柔守护，免受一次惩罚', cost: 30, level: 1, icon: Shield, color: 'primary' },
+  { id: 'shield' as const, name: '甜心护盾', desc: '温柔守护，免受一次惩罚', cost: 50, level: 1, icon: Shield, color: 'primary' },
   { id: 'booster' as const, name: '爱情助推器', desc: '爱意加速，下次步数翻倍', cost: 40, level: 2, icon: Rocket, color: 'primary' },
-  { id: 'customDare' as const, name: '空白大冒险卡', desc: '亲自写下一条大冒险，加入题库中', cost: 50, level: 2, icon: PenTool, color: 'purple' },
-  { id: 'wishCoupon' as const, name: '现实心愿券', desc: '让对方在现实中为你完成一个心愿', cost: 100, level: 3, icon: Ticket, color: 'pink' },
+  { id: 'customDare' as const, name: '空白大冒险卡', desc: '亲自写下一条大冒险，加入题库中', cost: 100, level: 2, icon: PenTool, color: 'purple' },
+  { id: 'wishCoupon' as const, name: '现实心愿券', desc: '让对方在现实中为你完成一个心愿', cost: 300, level: 3, icon: Ticket, color: 'pink' },
 ];
 
 interface ShopModalProps {

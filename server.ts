@@ -224,9 +224,9 @@ io.on('connection', (socket) => {
 
     // Check if passing finish line (tile 32)
     if (player.position + finalRoll > 32) {
-      player.coins += 50;
-      addExp(player, 50);
-      addLog(room, `${player.name} 经过终点，获得 50 金币和 50 经验！`);
+      player.coins += 10;
+      addExp(player, 10);
+      addLog(room, `${player.name} 经过终点，获得 10 金币和 10 经验！`);
       
       // Mark lap completion
       if (role === 'him') {
@@ -275,17 +275,17 @@ io.on('connection', (socket) => {
         her.position = avgPos;
         addLog(room, `💕 特殊事件：心心相印！双方位置同步`);
       } else if (triggeredEvent === 'blessing') {
-        player.coins += 50;
+        player.coins += 10;
         addExp(player, 30);
-        addLog(room, `✨ 特殊事件：爱神祝福！获得50金币和30经验`);
+        addLog(room, `✨ 特殊事件：爱神祝福！获得10金币和30经验`);
       } else if (triggeredEvent === 'timespace' && him && her) {
         him.position = Math.floor(Math.random() * 32) + 1;
         her.position = Math.floor(Math.random() * 32) + 1;
         addLog(room, `🌀 特殊事件：时空裂隙！双方被传送`);
       } else if (triggeredEvent === 'fortune' && him && her) {
-        him.coins += 30;
-        her.coins += 30;
-        addLog(room, `💰 特殊事件：财神驾到！双方各获得30金币`);
+        him.coins += 10;
+        her.coins += 10;
+        addLog(room, `💰 特殊事件：财神驾到！双方各获得10金币`);
       } else if (triggeredEvent === 'lock' && him && her) {
         const target = role === 'him' ? her : him;
         target.itemLocked = true;
@@ -390,8 +390,8 @@ io.on('connection', (socket) => {
       stealer.coins += amount;
       addLog(room, `${triggerPlayer?.name || '玩家'} 触发了命运：散财童子！偷取了对方 ${amount} 金币`);
     } else if (fate === 'bonus' && triggerPlayer) {
-      triggerPlayer.coins += 50;
-      addLog(room, `${triggerPlayer.name} 触发了命运：天降甘霖！获得了 50 金币`);
+      triggerPlayer.coins += 10;
+      addLog(room, `${triggerPlayer.name} 触发了命运：天降甘霖！获得了 10 金币`);
     } else if (fate === 'forward' && triggerPlayer) {
       triggerPlayer.position = ((triggerPlayer.position + 3 - 1) % 32) + 1;
       addLog(room, `${triggerPlayer.name} 触发了命运：顺风顺水！前进了 3 步`);
@@ -422,8 +422,8 @@ io.on('connection', (socket) => {
         stealer.coins += amount;
         addLog(room, `→ 命运轮盘结果：散财童子！偷取了对方 ${amount} 金币`);
       } else if (fate === 'bonus' && triggerPlayer) {
-        triggerPlayer.coins += 50;
-        addLog(room, `→ 命运轮盘结果：天降甘霖！获得了 50 金币`);
+        triggerPlayer.coins += 10;
+        addLog(room, `→ 命运轮盘结果：天降甘霖！获得了 10 金币`);
       } else if (fate === 'forward' && triggerPlayer) {
         triggerPlayer.position = ((triggerPlayer.position + 3 - 1) % 32) + 1;
         addLog(room, `→ 命运轮盘结果：顺风顺水！前进了 3 步`);
