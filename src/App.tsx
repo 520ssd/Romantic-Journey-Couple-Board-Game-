@@ -438,10 +438,10 @@ export default function App() {
       <RewardModal
         isOpen={activeModal === 'reward'}
         onClose={() => {
-          socket.emit('addCoins', { roomId, role, amount: 10, reason: '获得奖励' });
+          socket.emit('addCoins', { roomId, role, amount: 5, reason: '获得奖励' });
           handleCloseModal();
         }}
-        amount={10}
+        amount={5}
         isReadOnly={modalPlayer !== role}
       />
 
@@ -480,8 +480,8 @@ export default function App() {
           socket.emit('syncModal', { roomId, modalType: 'quiz', modalState: newState, isOpen: true, modalPlayer: modalPlayer });
           
           if (isMatch) {
-            socket.emit('addCoins', { roomId, role: 'him', amount: 30, reason: '默契满分' });
-            socket.emit('addCoins', { roomId, role: 'her', amount: 30, reason: '默契满分' });
+            socket.emit('addCoins', { roomId, role: 'him', amount: 5, reason: '默契满分' });
+            socket.emit('addCoins', { roomId, role: 'her', amount: 5, reason: '默契满分' });
           }
         }}
       />

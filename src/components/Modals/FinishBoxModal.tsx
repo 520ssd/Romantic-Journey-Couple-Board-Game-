@@ -15,14 +15,14 @@ export default function FinishBoxModal({ isOpen, onClose, onSelect, isReadOnly }
   if (!isOpen) return null;
 
   const boxes = [
-    { id: 0, title: '浪漫大餐', desc: '对方请客吃一顿大餐！', icon: Utensils, color: 'bg-rose-500' },
-    { id: 1, title: '免死金牌', desc: '免除一次家务！', icon: Shield, color: 'bg-blue-500' },
-    { id: 2, title: '神秘礼物', desc: '对方需要为你准备一份小礼物！', icon: Gift, color: 'bg-purple-500' },
-    { id: 3, title: '专属按摩', desc: '对方为你按摩30分钟！', icon: Heart, color: 'bg-pink-500' },
-    { id: 4, title: '电影之夜', desc: '对方陪你看一部电影！', icon: Film, color: 'bg-indigo-500' },
-    { id: 5, title: '深情告白', desc: '对方当面说10句情话！', icon: Heart, color: 'bg-red-500' },
-    { id: 6, title: '游戏时间', desc: '对方陪你玩1小时游戏！', icon: Gamepad2, color: 'bg-emerald-500' },
-    { id: 7, title: '心愿达成', desc: '对方满足你一个小愿望！', icon: Star, color: 'bg-amber-500' },
+    { id: 0, title: '浪漫餐卡', desc: '获得餐卡碎片1张，集齐20个可让对方做饭一次！', icon: Utensils, color: 'bg-rose-500' },
+    { id: 1, title: '免死金牌', desc: '获得和好卡碎片1张，集齐20个可以获得和好卡一张！', icon: Shield, color: 'bg-blue-500' },
+    { id: 2, title: '神秘礼物', desc: '获得礼物卡碎片1张，集齐20个可以获得礼物卡一张！', icon: Gift, color: 'bg-purple-500' },
+    { id: 3, title: '专属按摩', desc: '获得按摩卡碎片1张，集齐20个张可以获得按摩卡一张！', icon: Heart, color: 'bg-pink-500' },
+    { id: 4, title: '无', desc: '无！', icon: Film, color: 'bg-indigo-500' },
+    { id: 5, title: '无', desc: '无', icon: Heart, color: 'bg-red-500' },
+    { id: 6, title: '无', desc: '无', icon: Gamepad2, color: 'bg-emerald-500' },
+    { id: 7, title: '心愿达成', desc: '获得心愿卡碎片一张，集齐20个可以获得心愿卡一张！', icon: Star, color: 'bg-amber-500' },
   ];
 
   const handleSelect = (index: number) => {
