@@ -27,7 +27,7 @@ export default function Header() {
             <Heart className="text-pink-500 w-5 h-5 fill-pink-500" />
           </div>
           <h2 className="text-xl font-bold leading-tight tracking-tight text-[var(--text-primary)]">
-            浪漫旅程
+            陈洁娴，我爱你
           </h2>
         </div>
         <div className="flex gap-3">

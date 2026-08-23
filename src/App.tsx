@@ -406,6 +406,8 @@ export default function App() {
         coins={myPlayer.coins}
         boardLevel={gameState.boardLevel || 1}
         questionBankId={gameState.questionBankId || 'normal'}
+        // 👇 必须加这一行，否则无法实现防重复抽题
+        roomId={roomId}
         customQuestionBanks={(() => {
           const level = gameState.boardLevel || 1;
           if (gameState.questionBanks && gameState.questionBanks[level]) {

@@ -60,6 +60,8 @@ interface GameState {
   himCompletedLap: boolean;
   herCompletedLap: boolean;
   questionBankId: string;
+  // 👇 新增：用来记录已经抽过的题目，防止重复
+  usedQuestions: Set<string>; 
   questionBanks: Record<number, {
     truth: string[];
     dare: string[];
@@ -98,6 +100,33 @@ function addExp(player: PlayerState, amount: number) {
   }
 }
 
+// 👇 新增核心函数：从题库中抽取一道“不重复”的题
+function drawUniqueQuestion(room: GameState, type: 'truth' | 'dare' | 'punishment', level: number): string {
+  const bank = room.questionBanks[level] || room.questionBanks[1];
+  if (!bank) return "题库不见了，快去添加新题目吧！";
+
+  const pool = bank[type];
+  if (!pool || pool.length === 0) return "这个分类的题目用完了，去自定义一道吧！";
+
+  // 找出所有还没用过的题目
+  const available = pool.filter(q => !room.usedQuestions.has(`${level}-${type}-${q}`));
+
+  // 如果全用完了，清空记录，重新开始（避免游戏玩不下去，但会提醒玩家）
+  if (available.length === 0) {
+    room.usedQuestions.clear();
+    const resetIndex = Math.floor(Math.random() * pool.length);
+    const resetQuestion = pool[resetIndex];
+    room.usedQuestions.add(`${level}-${type}-${resetQuestion}`);
+    return resetQuestion;
+  }
+
+  // 正常抽取未用过的题
+  const randomIndex = Math.floor(Math.random() * available.length);
+  const question = available[randomIndex];
+  room.usedQuestions.add(`${level}-${type}-${question}`);
+  return question;
+}
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -117,8 +146,23 @@ io.on('connection', (socket) => {
       herCompletedLap: false,
       questionBankId: bankId,
       questionBanks: banks,
+      // 👇 初始化新的去重集合
+      usedQuestions: new Set(),
     });
     callback({ roomId, questionBankId: bankId });
+  });
+
+  // 👇 新增：前端请求抽题的接口，把结果发给前端
+  socket.on('requestUniqueQuestion', ({ roomId, type, level }, callback) => {
+    const room = rooms.get(roomId);
+    if (!room) return callback({ error: '房间不存在' });
+    
+    const targetLevel = level || room.boardLevel || 1;
+    const question = drawUniqueQuestion(room, type, targetLevel);
+    
+    // 更新玩家端
+    io.to(roomId).emit('gameStateUpdate', room);
+    callback({ success: true, question });
   });
 
   socket.on('saveCustomQuestions', ({ roomId, questionBanks }) => {

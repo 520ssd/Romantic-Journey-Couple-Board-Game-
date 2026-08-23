@@ -2,6 +2,8 @@ import { Heart, RefreshCw, X, AlertCircle, CircleDollarSign } from 'lucide-react
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '../Toast';
 import { getQuestions } from '../../data/questions';
+// 👇 新增：引入 socket 用于向后端请求不重复的题目
+import { socket } from '../../socket'; 
 
 interface ChallengeModalProps {
   isOpen: boolean;
@@ -23,6 +25,8 @@ interface ChallengeModalProps {
     dare: string[];
     punishment: string[];
   };
+  // 👇 新增：接收从 App.tsx 传来的 roomId
+  roomId?: string; 
 }
 
 export default function ChallengeModal({
@@ -41,6 +45,7 @@ export default function ChallengeModal({
   boardLevel = 1,
   questionBankId = 'normal',
   customQuestionBanks = { truth: [], dare: [], punishment: [] },
+  roomId = '', // 👇 默认值
 }: ChallengeModalProps) {
   const toast = useToast();
   const spentCoinsRef = useRef(0);
@@ -84,28 +89,41 @@ export default function ChallengeModal({
     if (onStateChange) onStateChange(updated);
   };
 
+  // 👇 新增：防重复抽题函数 (和服务器沟通)
+  const fetchUniqueQuestion = (type: 'truth' | 'dare', level: number) => {
+    socket.emit('requestUniqueQuestion', { roomId, type, level }, (res: any) => {
+      if (res && res.success) {
+        const newState = type === 'truth' 
+          ? { currentTruthQuestion: res.question } 
+          : { currentDareQuestion: res.question };
+        updateState(newState);
+      } else {
+        // 如果服务器没找到题库，退回本地随机
+        const fallbackPool = type === 'truth' ? truthQuestions : dareQuestions;
+        const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+        updateState(type === 'truth' ? { currentTruthQuestion: fallback } : { currentDareQuestion: fallback });
+      }
+    });
+  };
+
   // Initialize or reset state when modal opens
   useEffect(() => {
     if (isOpen && !isReadOnly) {
+      // 初始加载也走防重复接口
+      fetchUniqueQuestion('truth', boardLevel);
+      fetchUniqueQuestion('dare', boardLevel);
+      
       const initial = {
         activeTab: 'truth' as 'truth' | 'dare',
-        currentTruthQuestion: truthQuestions[Math.floor(Math.random() * truthQuestions.length)],
-        currentDareQuestion: dareQuestions[Math.floor(Math.random() * dareQuestions.length)],
+        currentTruthQuestion: '',
+        currentDareQuestion: '',
         showPunishment: false,
         currentPunishment: ''
       };
       setLocalState(initial);
       if (onStateChange) onStateChange(initial);
     }
-  }, [isOpen, isReadOnly]);
-
-  const getRandomDare = () => {
-    // 30% chance to pick a custom dare if available
-    if (customDares.length > 0 && Math.random() < 0.3) {
-      return customDares[Math.floor(Math.random() * customDares.length)];
-    }
-    return dareQuestions[Math.floor(Math.random() * dareQuestions.length)];
-  };
+  }, [isOpen, isReadOnly, boardLevel, roomId]);
 
   const handleTabChange = (tab: 'truth' | 'dare') => {
     if (isReadOnly) return;
@@ -121,22 +139,11 @@ export default function ChallengeModal({
       return;
     }
     
+    // 👇 新增：换题也走防重复接口
     if (state.activeTab === 'truth') {
-      let newQuestion = state.currentTruthQuestion;
-      let attempts = 0;
-      while (newQuestion === state.currentTruthQuestion && attempts < 10) {
-        newQuestion = truthQuestions[Math.floor(Math.random() * truthQuestions.length)];
-        attempts++;
-      }
-      updateState({ currentTruthQuestion: newQuestion });
+      fetchUniqueQuestion('truth', boardLevel);
     } else {
-      let newQuestion = state.currentDareQuestion;
-      let attempts = 0;
-      while (newQuestion === state.currentDareQuestion && attempts < 10) {
-        newQuestion = getRandomDare();
-        attempts++;
-      }
-      updateState({ currentDareQuestion: newQuestion });
+      fetchUniqueQuestion('dare', boardLevel);
     }
     
     spentCoinsRef.current += 30;
@@ -150,6 +157,7 @@ export default function ChallengeModal({
       onSkip();
       toast.showToast('甜心护盾生效，免受惩罚！', 'success');
     } else {
+      // 惩罚题目为避免复杂化，仍保持本地随机（或者你也能改成请求后端）
       updateState({
         showPunishment: true,
         currentPunishment: punishments[Math.floor(Math.random() * punishments.length)]
