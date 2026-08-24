@@ -2,8 +2,6 @@ import { Heart, RefreshCw, X, AlertCircle, CircleDollarSign } from 'lucide-react
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '../Toast';
 import { getQuestions } from '../../data/questions';
-// 👇 新增：引入 socket 用于向后端请求不重复的题目
-import { socket } from '../../socket'; 
 
 interface ChallengeModalProps {
   isOpen: boolean;
@@ -25,9 +23,14 @@ interface ChallengeModalProps {
     dare: string[];
     punishment: string[];
   };
-  // 👇 新增：接收从 App.tsx 传来的 roomId
-  roomId?: string; 
 }
+
+// ✅ 本地防重复存储键名
+const STORAGE_KEYS = {
+  truth: 'used_truth_questions',
+  dare: 'used_dare_questions',
+  punishment: 'used_punishment_questions'
+};
 
 export default function ChallengeModal({
   isOpen,
@@ -45,7 +48,6 @@ export default function ChallengeModal({
   boardLevel = 1,
   questionBankId = 'normal',
   customQuestionBanks = { truth: [], dare: [], punishment: [] },
-  roomId = '', // 👇 默认值
 }: ChallengeModalProps) {
   const toast = useToast();
   const spentCoinsRef = useRef(0);
@@ -89,41 +91,75 @@ export default function ChallengeModal({
     if (onStateChange) onStateChange(updated);
   };
 
-  // 👇 新增：防重复抽题函数 (和服务器沟通)
-  const fetchUniqueQuestion = (type: 'truth' | 'dare', level: number) => {
-    socket.emit('requestUniqueQuestion', { roomId, type, level }, (res: any) => {
-      if (res && res.success) {
-        const newState = type === 'truth' 
-          ? { currentTruthQuestion: res.question } 
-          : { currentDareQuestion: res.question };
-        updateState(newState);
-      } else {
-        // 如果服务器没找到题库，退回本地随机
-        const fallbackPool = type === 'truth' ? truthQuestions : dareQuestions;
-        const fallback = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
-        updateState(type === 'truth' ? { currentTruthQuestion: fallback } : { currentDareQuestion: fallback });
-      }
-    });
+  // ✅ 核心防重复工具函数：读取已用过的题目
+  const getUsedQuestions = (type: 'truth' | 'dare' | 'punishment'): string[] => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS[type]) || '[]');
+    } catch {
+      return [];
+    }
+  };
+
+  // ✅ 核心防重复工具函数：标记该题已用过
+  const markQuestionAsUsed = (type: 'truth' | 'dare' | 'punishment', question: string) => {
+    const used = getUsedQuestions(type);
+    if (!used.includes(question)) {
+      used.push(question);
+      // 为了防止无限扩大，只保留最近 200 道题
+      if (used.length > 200) used.shift();
+      localStorage.setItem(STORAGE_KEYS[type], JSON.stringify(used));
+    }
+  };
+
+  // ✅ 核心防重复工具函数：抽不重复的题
+  const getRandomUniqueQuestion = (pool: string[], type: 'truth' | 'dare' | 'punishment'): string => {
+    if (!pool || pool.length === 0) return "暂无题目，请去题库中添加！";
+    
+    let used = getUsedQuestions(type);
+    // 过滤掉已用过的
+    let available = pool.filter(q => !used.includes(q));
+
+    // 如果全用完了，清空历史，重新开始（保证永远有题）
+    if (available.length === 0) {
+      localStorage.removeItem(STORAGE_KEYS[type]);
+      used = [];
+      available = pool;
+    }
+
+    const randomIndex = Math.floor(Math.random() * available.length);
+    const question = available[randomIndex];
+    
+    // 记录这道题
+    markQuestionAsUsed(type, question);
+    return question;
   };
 
   // Initialize or reset state when modal opens
   useEffect(() => {
     if (isOpen && !isReadOnly) {
-      // 初始加载也走防重复接口
-      fetchUniqueQuestion('truth', boardLevel);
-      fetchUniqueQuestion('dare', boardLevel);
+      // 用“防重复”算法抽题
+      const newTruth = getRandomUniqueQuestion(truthQuestions, 'truth');
+      const newDare = getRandomUniqueQuestion(dareQuestions, 'dare');
       
       const initial = {
         activeTab: 'truth' as 'truth' | 'dare',
-        currentTruthQuestion: '',
-        currentDareQuestion: '',
+        currentTruthQuestion: newTruth,
+        currentDareQuestion: newDare,
         showPunishment: false,
         currentPunishment: ''
       };
       setLocalState(initial);
       if (onStateChange) onStateChange(initial);
     }
-  }, [isOpen, isReadOnly, boardLevel, roomId]);
+  }, [isOpen, isReadOnly]);
+
+  const getRandomDare = () => {
+    // 30% chance to pick a custom dare if available
+    if (customDares.length > 0 && Math.random() < 0.3) {
+      return customDares[Math.floor(Math.random() * customDares.length)];
+    }
+    return getRandomUniqueQuestion(dareQuestions, 'dare');
+  };
 
   const handleTabChange = (tab: 'truth' | 'dare') => {
     if (isReadOnly) return;
@@ -139,11 +175,12 @@ export default function ChallengeModal({
       return;
     }
     
-    // 👇 新增：换题也走防重复接口
     if (state.activeTab === 'truth') {
-      fetchUniqueQuestion('truth', boardLevel);
+      const newQuestion = getRandomUniqueQuestion(truthQuestions, 'truth');
+      updateState({ currentTruthQuestion: newQuestion });
     } else {
-      fetchUniqueQuestion('dare', boardLevel);
+      const newQuestion = getRandomDare();
+      updateState({ currentDareQuestion: newQuestion });
     }
     
     spentCoinsRef.current += 30;
@@ -157,10 +194,10 @@ export default function ChallengeModal({
       onSkip();
       toast.showToast('甜心护盾生效，免受惩罚！', 'success');
     } else {
-      // 惩罚题目为避免复杂化，仍保持本地随机（或者你也能改成请求后端）
+      const newPunishment = getRandomUniqueQuestion(punishments, 'punishment');
       updateState({
         showPunishment: true,
-        currentPunishment: punishments[Math.floor(Math.random() * punishments.length)]
+        currentPunishment: newPunishment
       });
     }
   };
@@ -214,13 +251,8 @@ export default function ChallengeModal({
                   <div className="absolute top-4 left-4 text-primary/10 text-4xl font-serif">"</div>
 
                   {/* Image placeholder for decorative mood */}
-                  <div className="mb-6 w-full h-32 overflow-hidden rounded-lg relative">
-                    <img
-                      className="w-full h-full object-cover"
-                      alt="Soft pink romantic background with blurred hearts"
-                      src="/avatars/unnamed.png"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white from-slate-700 to-transparent"></div>
+                  <div className="mb-6 w-full h-32 overflow-hidden rounded-lg relative bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                    <Heart className="w-16 h-16 text-pink-500 fill-pink-500 animate-bounce" />
                   </div>
 
                   <p className="text-lg font-medium leading-relaxed text-slate-800 text-[var(--text-primary)]">
