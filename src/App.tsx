@@ -393,7 +393,7 @@ export default function App() {
         />
       </main>
 
-      <ChallengeModal
+           <ChallengeModal
         isOpen={activeModal === 'challenge'}
         onClose={handleCloseModal}
         onComplete={handleCompleteChallenge}
@@ -406,18 +406,7 @@ export default function App() {
         coins={myPlayer.coins}
         boardLevel={gameState.boardLevel || 1}
         questionBankId={gameState.questionBankId || 'normal'}
-        // 👇 必须加这一行，否则无法实现防重复抽题
-        roomId={roomId}
-        customQuestionBanks={(() => {
-          const level = gameState.boardLevel || 1;
-          if (gameState.questionBanks && gameState.questionBanks[level]) {
-            return gameState.questionBanks[level];
-          }
-          if (gameState.questionBanks && gameState.questionBanks[1]) {
-            return gameState.questionBanks[1];
-          }
-          return { truth: [], dare: [], punishment: [] };
-        })()}
+        // 注意：这里移除了 roomId 和 customQuestionBanks，避免读取到空数据！
         onSpendCoins={(amount) => {
           socket.emit('spendCoins', { roomId, role, amount, reason: '换一个问题' });
         }}

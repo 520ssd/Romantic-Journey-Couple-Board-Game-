@@ -58,25 +58,11 @@ export default function ChallengeModal({
   const isLongDistanceMode = questionBankId === 'longdistance';
   const baseQuestions = getQuestions(boardLevel, isSmMode, undefined, isLongDistanceMode);
   
-  const hasCustomQuestions = customQuestionBanks && customQuestionBanks.truth && customQuestionBanks.truth.length > 0;
-  const truthQuestions = hasCustomQuestions 
-    ? customQuestionBanks.truth 
-    : [...baseQuestions.truth, ...(customQuestionBanks?.truth || [])];
-  const dareQuestions = hasCustomQuestions 
-    ? customQuestionBanks.dare 
-    : [...baseQuestions.dare, ...(customQuestionBanks?.dare || []), ...customDares];
-  const punishments = hasCustomQuestions 
-    ? customQuestionBanks.punishment 
-    : [...baseQuestions.punishment, ...(customQuestionBanks?.punishment || [])];
-
-  useEffect(() => {
-    if (isOpen) {
-      spentCoinsRef.current = 0;
-    }
-  }, [isOpen]);
+  const truthQuestions = [...baseQuestions.truth, ...(customQuestionBanks?.truth || [])];
+  const dareQuestions = [...baseQuestions.dare, ...(customQuestionBanks?.dare || []), ...customDares];
+  const punishments = [...baseQuestions.punishment, ...(customQuestionBanks?.punishment || [])];
 
   const state = isReadOnly && sharedState ? sharedState : localState;
-
   const updateState = (newState: Partial<typeof localState>) => {
     if (isReadOnly) return;
     const updated = { ...state, ...newState };
@@ -102,7 +88,7 @@ export default function ChallengeModal({
 
   // ✅ 核心：从池子中抽取未用过的题，抽完自动重置
   const getRandomUniqueQuestion = (pool: string[], type: 'truth' | 'dare' | 'punishment'): string => {
-    if (!pool || pool.length === 0) return "暂无题目，请去题库中添加！";
+    if (!pool || pool.length === 0) return "题目库为空，请去题库添加题目！";
     
     let used = getUsedQuestions(type);
     let available = pool.filter(q => !used.includes(q));
