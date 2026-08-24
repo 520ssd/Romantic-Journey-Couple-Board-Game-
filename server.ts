@@ -3,6 +3,9 @@ import { createServer as createViteServer } from 'vite';
 import { Server } from 'socket.io';
 import http from 'http';
 
+// 👇 直接强制引入本地题库（这是你修改题目后能生效的唯一保证）
+import { QUESTION_BANKS, SM_QUESTION_BANKS, LONGDISTANCE_QUESTION_BANKS } from './data/questions';
+
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 
@@ -60,7 +63,7 @@ interface GameState {
   himCompletedLap: boolean;
   herCompletedLap: boolean;
   questionBankId: string;
-  // 👇 新增：用来记录已经抽过的题目，防止重复
+  // 用来记录已经抽过的题目，防止重复
   usedQuestions: Set<string>; 
   questionBanks: Record<number, {
     truth: string[];
@@ -100,7 +103,7 @@ function addExp(player: PlayerState, amount: number) {
   }
 }
 
-// 👇 新增核心函数：从题库中抽取一道“不重复”的题
+// 👇 核心函数：从题库中抽取一道“不重复”的题
 function drawUniqueQuestion(room: GameState, type: 'truth' | 'dare' | 'punishment', level: number): string {
   const bank = room.questionBanks[level] || room.questionBanks[1];
   if (!bank) return "题库不见了，快去添加新题目吧！";
@@ -111,7 +114,7 @@ function drawUniqueQuestion(room: GameState, type: 'truth' | 'dare' | 'punishmen
   // 找出所有还没用过的题目
   const available = pool.filter(q => !room.usedQuestions.has(`${level}-${type}-${q}`));
 
-  // 如果全用完了，清空记录，重新开始（避免游戏玩不下去，但会提醒玩家）
+  // 如果全用完了，清空记录，重新开始
   if (available.length === 0) {
     room.usedQuestions.clear();
     const resetIndex = Math.floor(Math.random() * pool.length);
@@ -133,7 +136,15 @@ io.on('connection', (socket) => {
   socket.on('createRoom', ({ questionBank }: { questionBank?: any }, callback) => {
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
     const bankId = questionBank?.id || 'normal';
-    const banks = questionBank?.levels || { 1: { truth: [], dare: [], punishment: [] }, 2: { truth: [], dare: [], punishment: [] }, 3: { truth: [], dare: [], punishment: [] } };
+
+    // 👇 强行强制读取本地题库！无视前端传输，确保修改生效！
+    let banks: any = QUESTION_BANKS; // 默认普通模式
+    if (bankId === 'sm') {
+      banks = SM_QUESTION_BANKS;
+    } else if (bankId === 'longdistance') {
+      banks = LONGDISTANCE_QUESTION_BANKS;
+    }
+
     rooms.set(roomId, {
       roomId,
       players: { him: null, her: null },
@@ -146,7 +157,6 @@ io.on('connection', (socket) => {
       herCompletedLap: false,
       questionBankId: bankId,
       questionBanks: banks,
-      // 👇 初始化新的去重集合
       usedQuestions: new Set(),
     });
     callback({ roomId, questionBankId: bankId });
