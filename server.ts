@@ -1,11 +1,7 @@
-import { QUESTION_BANKS } from './data/questions';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import { Server } from 'socket.io';
 import http from 'http';
-
-// 👇 直接强制引入本地题库（这是你修改题目后能生效的唯一保证）
-import { QUESTION_BANKS, SM_QUESTION_BANKS, LONGDISTANCE_QUESTION_BANKS } from './data/questions';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -64,8 +60,6 @@ interface GameState {
   himCompletedLap: boolean;
   herCompletedLap: boolean;
   questionBankId: string;
-  // 用来记录已经抽过的题目，防止重复
-  usedQuestions: Set<string>; 
   questionBanks: Record<number, {
     truth: string[];
     dare: string[];
@@ -104,33 +98,6 @@ function addExp(player: PlayerState, amount: number) {
   }
 }
 
-// 👇 核心函数：从题库中抽取一道“不重复”的题
-function drawUniqueQuestion(room: GameState, type: 'truth' | 'dare' | 'punishment', level: number): string {
-  const bank = room.questionBanks[level] || room.questionBanks[1];
-  if (!bank) return "题库不见了，快去添加新题目吧！";
-
-  const pool = bank[type];
-  if (!pool || pool.length === 0) return "这个分类的题目用完了，去自定义一道吧！";
-
-  // 找出所有还没用过的题目
-  const available = pool.filter(q => !room.usedQuestions.has(`${level}-${type}-${q}`));
-
-  // 如果全用完了，清空记录，重新开始
-  if (available.length === 0) {
-    room.usedQuestions.clear();
-    const resetIndex = Math.floor(Math.random() * pool.length);
-    const resetQuestion = pool[resetIndex];
-    room.usedQuestions.add(`${level}-${type}-${resetQuestion}`);
-    return resetQuestion;
-  }
-
-  // 正常抽取未用过的题
-  const randomIndex = Math.floor(Math.random() * available.length);
-  const question = available[randomIndex];
-  room.usedQuestions.add(`${level}-${type}-${question}`);
-  return question;
-}
-
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -138,13 +105,12 @@ io.on('connection', (socket) => {
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
     const bankId = questionBank?.id || 'normal';
 
-    // 👇 强行强制读取本地题库！无视前端传输，确保修改生效！
-    let banks: any = QUESTION_BANKS; // 默认普通模式
-    if (bankId === 'sm') {
-      banks = SM_QUESTION_BANKS;
-    } else if (bankId === 'longdistance') {
-      banks = LONGDISTANCE_QUESTION_BANKS;
-    }
+    // ✅ 后端只存空壳，题库由前端读取发送！
+    const banks = {
+      1: { truth: [], dare: [], punishment: [] },
+      2: { truth: [], dare: [], punishment: [] },
+      3: { truth: [], dare: [], punishment: [] }
+    };
 
     rooms.set(roomId, {
       roomId,
@@ -158,22 +124,8 @@ io.on('connection', (socket) => {
       herCompletedLap: false,
       questionBankId: bankId,
       questionBanks: banks,
-      usedQuestions: new Set(),
     });
     callback({ roomId, questionBankId: bankId });
-  });
-
-  // 👇 新增：前端请求抽题的接口，把结果发给前端
-  socket.on('requestUniqueQuestion', ({ roomId, type, level }, callback) => {
-    const room = rooms.get(roomId);
-    if (!room) return callback({ error: '房间不存在' });
-    
-    const targetLevel = level || room.boardLevel || 1;
-    const question = drawUniqueQuestion(room, type, targetLevel);
-    
-    // 更新玩家端
-    io.to(roomId).emit('gameStateUpdate', room);
-    callback({ success: true, question });
   });
 
   socket.on('saveCustomQuestions', ({ roomId, questionBanks }) => {
