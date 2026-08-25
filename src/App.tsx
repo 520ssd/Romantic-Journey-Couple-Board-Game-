@@ -393,7 +393,7 @@ export default function App() {
         />
       </main>
 
-                 <ChallengeModal
+                       <ChallengeModal
         isOpen={activeModal === 'challenge'}
         onClose={handleCloseModal}
         onComplete={handleCompleteChallenge}
@@ -406,12 +406,6 @@ export default function App() {
         coins={myPlayer.coins}
         boardLevel={gameState.boardLevel || 1}
         questionBankId={gameState.questionBankId || 'normal'}
-        // ✅ 强制传入我们刚才修改的本地题库！
-        customQuestionBanks={(() => {
-          const level = gameState.boardLevel || 1;
-          const qBank = require('../data/questions').QUESTION_BANKS; 
-          return qBank[level] || qBank[1];
-        })()}
         onSpendCoins={(amount) => {
           socket.emit('spendCoins', { roomId, role, amount, reason: '换一个问题' });
         }}
