@@ -1,4 +1,4 @@
-export const QUESTION_BANKS = {
+export const QUESTION_BANKS: any = {
   1: {
     truth: [
       "你最想和我尝试的姿势是什么？详细描述一下。",
