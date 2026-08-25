@@ -18,11 +18,7 @@ interface ChallengeModalProps {
   onSpendCoins?: (amount: number) => void;
   boardLevel?: number;
   questionBankId?: string;
-  customQuestionBanks?: {
-    truth: string[];
-    dare: string[];
-    punishment: string[];
-  };
+  // 注意：这里我们主动删掉了 customQuestionBanks 和 roomId！
 }
 
 export default function ChallengeModal({
@@ -40,7 +36,6 @@ export default function ChallengeModal({
   onSpendCoins,
   boardLevel = 1,
   questionBankId = 'normal',
-  customQuestionBanks = { truth: [], dare: [], punishment: [] },
 }: ChallengeModalProps) {
   const toast = useToast();
   const spentCoinsRef = useRef(0);
@@ -56,11 +51,13 @@ export default function ChallengeModal({
   
   const isSmMode = questionBankId === 'sm';
   const isLongDistanceMode = questionBankId === 'longdistance';
+  
+  // ✅ 100% 从本地代码（data/questions.ts）里读取，绝对不依赖后端！
   const baseQuestions = getQuestions(boardLevel, isSmMode, undefined, isLongDistanceMode);
   
-  const truthQuestions = [...baseQuestions.truth, ...(customQuestionBanks?.truth || [])];
-  const dareQuestions = [...baseQuestions.dare, ...(customQuestionBanks?.dare || []), ...customDares];
-  const punishments = [...baseQuestions.punishment, ...(customQuestionBanks?.punishment || [])];
+  const truthQuestions = baseQuestions.truth;
+  const dareQuestions = [...baseQuestions.dare, ...customDares];
+  const punishments = baseQuestions.punishment;
 
   const state = isReadOnly && sharedState ? sharedState : localState;
   const updateState = (newState: Partial<typeof localState>) => {
@@ -86,9 +83,9 @@ export default function ChallengeModal({
     }
   };
 
-  // ✅ 核心：从池子中抽取未用过的题，抽完自动重置
+  // ✅ 核心防重复逻辑
   const getRandomUniqueQuestion = (pool: string[], type: 'truth' | 'dare' | 'punishment'): string => {
-    if (!pool || pool.length === 0) return "题目库为空，请去题库添加题目！";
+    if (!pool || pool.length === 0) return "题库为空，请去 data/questions.ts 添加题目！";
     
     let used = getUsedQuestions(type);
     let available = pool.filter(q => !used.includes(q));

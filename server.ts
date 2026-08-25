@@ -1,3 +1,4 @@
+import { QUESTION_BANKS } from './data/questions';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import { Server } from 'socket.io';
